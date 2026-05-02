@@ -1,0 +1,142 @@
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    background: #000;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Fondo animado */
+#bg-animation {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: #000;
+}
+
+/* Capa oscura encima de la animación */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.04), rgba(0,0,0,0.65));
+    pointer-events: none;
+}
+
+/* Este bloque te falta */
+.login-wrapper {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    position: relative;
+    z-index: 3;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.login-card h2 {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.14);
+    border: none;
+    color: white;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: none;
+    color: white;
+}
+
+.input-group-text {
+    background: rgba(255, 255, 255, 0.14);
+    border: none;
+    color: white;
+}
+
+.form-check-input {
+    background-color: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.35);
+}
+
+.form-check-label {
+    color: rgba(255,255,255,0.9);
+}
+
+.btn-login {
+    background: linear-gradient(45deg, #ff512f, #dd2476);
+    border: none;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+}
+
+.extra-links {
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.extra-links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+
+.logo {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+canvas {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,530 @@
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+body {
+    background: #000;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    position: relative;
+}
+
+#bg-animation {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: #000;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background:
+        radial-gradient(circle at top left, rgba(0, 191, 255, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(221, 36, 118, 0.13), transparent 36%),
+        rgba(0, 0, 0, 0.18);
+    pointer-events: none;
+}
+
+.expenses-wrapper {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    width: 100%;
+    padding: 60px 24px;
+}
+
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-dialog {
+    z-index: 1060 !important;
+}
+
+body.modal-open::after {
+    z-index: 1;
+}
+
+.expenses-header {
+    text-align: center;
+    margin-bottom: 45px;
+    position: relative;
+}
+
+.back-link {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: 0.25s ease;
+}
+
+.back-link:hover {
+    color: white;
+    transform: translateX(-4px);
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.header-icon {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 18px;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 35px rgba(0, 191, 255, 0.24);
+}
+
+.header-icon i {
+    font-size: 34px;
+}
+
+.expenses-header h1 {
+    font-size: clamp(2.1rem, 5vw, 3.7rem);
+    font-weight: 800;
+    margin: 0;
+}
+
+.expenses-header p {
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.68);
+}
+
+.expenses-grid {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.expense-card {
+    position: relative;
+    min-height: 175px;
+    padding: 26px;
+    border-radius: 28px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+    transition:
+        transform 0.28s ease,
+        box-shadow 0.28s ease,
+        border-color 0.28s ease;
+}
+
+.expense-card:hover {
+    transform: translateY(-8px) rotateX(2deg) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.36);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.52),
+        0 0 36px rgba(0, 191, 255, 0.18);
+}
+
+.expense-card::before {
+    content: "";
+    position: absolute;
+    inset: -45%;
+    background: conic-gradient(
+        from 90deg,
+        transparent,
+        rgba(0, 191, 255, 0.32),
+        transparent,
+        rgba(138, 43, 226, 0.28),
+        transparent,
+        rgba(221, 36, 118, 0.26),
+        transparent
+    );
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    animation: rotateGlow 8s linear infinite;
+}
+
+.expense-card:hover::before {
+    opacity: 1;
+}
+
+.expense-card::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 27px;
+    background: rgba(8, 9, 14, 0.76);
+    z-index: 1;
+}
+
+.expense-content,
+.expense-arrow,
+.expense-orbit {
+    position: relative;
+    z-index: 2;
+}
+
+.expense-content h2 {
+    font-size: 1.35rem;
+    font-weight: 750;
+    margin: 0 0 8px;
+}
+
+.expense-content p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.66);
+}
+
+.expense-arrow {
+    position: absolute;
+    right: 22px;
+    bottom: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    box-shadow: 0 0 18px rgba(0, 191, 255, 0.32);
+    transition: transform 0.28s ease;
+}
+
+.expense-card:hover .expense-arrow {
+    transform: translate(4px, -4px);
+}
+
+.expense-orbit {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    width: 90px;
+    height: 90px;
+    opacity: 0.35;
+}
+
+.expense-orbit span {
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    transform: rotate(45deg);
+    animation: orbitSpin 8s linear infinite;
+}
+
+.expense-orbit span:nth-child(2) {
+    inset: 24px;
+    border-radius: 38% 62% 62% 38% / 45% 39% 61% 55%;
+    animation-duration: 5s;
+    animation-direction: reverse;
+}
+
+.expense-orbit span:nth-child(3) {
+    inset: 4px;
+    border-radius: 42% 58% 36% 64% / 55% 42% 58% 45%;
+    animation-duration: 11s;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 52px 24px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.empty-state i {
+    font-size: 48px;
+    opacity: 0.75;
+}
+
+.empty-state h2 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.68);
+}
+
+canvas {
+    display: block;
+}
+
+.custom-modal {
+    color: white;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(10, 10, 18, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.65),
+        0 0 42px rgba(0, 191, 255, 0.16);
+}
+
+.custom-modal .modal-header,
+.custom-modal .modal-footer {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.custom-modal .modal-title {
+    font-weight: 700;
+}
+
+.custom-modal .modal-body h3 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.custom-modal .modal-body p {
+    color: rgba(255, 255, 255, 0.76);
+    margin-bottom: 8px;
+}
+
+.btn-login {
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    border: none;
+    transition: 0.25s ease;
+}
+
+.btn-login:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 16px rgba(0, 191, 255, 0.35);
+}
+
+.btn-create-expense {
+    margin-top: 22px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    box-shadow: 0 0 22px rgba(0, 191, 255, 0.28);
+    transition: 0.25s ease;
+}
+
+.btn-create-expense:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 32px rgba(0, 191, 255, 0.42);
+}
+
+.btn-create-expense i {
+    margin-right: 6px;
+}
+
+.modal-input {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: white;
+    border-radius: 14px;
+}
+
+.modal-input::placeholder {
+    color: rgba(255, 255, 255, 0.48);
+}
+
+.modal-input:focus {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(0, 191, 255, 0.55);
+    box-shadow: 0 0 0 0.2rem rgba(0, 191, 255, 0.16);
+    color: white;
+}
+
+.custom-modal .form-label {
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 600;
+}
+
+.shared-box {
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.shared-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.shared-header h6 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.shared-header p {
+    margin: 4px 0 0;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.btn-select-all {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.12);
+    transition: 0.25s ease;
+}
+
+.btn-select-all:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.member-check-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 74px;
+    padding: 14px;
+    border-radius: 18px;
+    cursor: pointer;
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    transition: 0.25s ease;
+}
+
+.member-check-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 191, 255, 0.38);
+    box-shadow: 0 0 24px rgba(0, 191, 255, 0.12);
+}
+
+.member-check-card input {
+    width: 18px;
+    height: 18px;
+    accent-color: #00bfff;
+    position: relative;
+    z-index: 2;
+}
+
+.member-orb {
+    position: absolute;
+    right: -16px;
+    top: -16px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 191, 255, 0.28), transparent 66%);
+}
+
+.member-info {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.member-info strong {
+    color: white;
+    font-size: 0.95rem;
+}
+
+.member-info small {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.78rem;
+}
+
+.split-preview {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(0, 191, 255, 0.09);
+    border: 1px solid rgba(0, 191, 255, 0.16);
+    color: rgba(255, 255, 255, 0.82);
+    font-weight: 600;
+}
+
+.split-preview i {
+    margin-right: 8px;
+}
+
+@keyframes rotateGlow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes orbitSpin {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.12);
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .expenses-wrapper {
+        padding: 90px 16px 40px;
+    }
+
+    .back-link {
+        left: 50%;
+        transform: translateX(-50%);
+        top: -58px;
+        white-space: nowrap;
+    }
+
+    .back-link:hover {
+        transform: translateX(-50%);
+    }
+}
