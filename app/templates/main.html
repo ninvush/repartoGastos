@@ -9,41 +9,113 @@
 
 <main class="groups-wrapper">
     <section class="groups-header">
+        <div class="header-actions">
+            <a href="/logout" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                Cerrar sesión
+            </a>
+        </div>
+
         <div class="header-icon">
             <i class="bi bi-diagram-3"></i>
         </div>
 
         <h1>Grupos</h1>
         <p>Selecciona un grupo para explorar su espacio.</p>
+
+        <button type="button" class="btn-create-group" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+            <i class="bi bi-plus-circle"></i>
+            Crear grupo
+        </button>
     </section>
 
     <section class="groups-grid">
         {% for group in groups %}
-            <a href="/group/{{ group[0] }}" class="group-card">
-                <div class="card-geometry">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-
-                <div class="card-content">
-                    <h2>{{ group[1] }}</h2>
-                    <p>Entrar al grupo</p>
-                </div>
-
-                <div class="card-arrow">
-                    <i class="bi bi-arrow-right"></i>
-                </div>
-            </a>
-        {% else %}
-            <div class="empty-state">
-                <i class="bi bi-inbox"></i>
-                <h2>No hay grupos todavía</h2>
-                <p>Cuando existan grupos en la base de datos, aparecerán aquí.</p>
+        <a href="/group/{{ group[0] }}" class="group-card">
+            <div class="card-geometry">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
+
+            <div class="card-content">
+                <h2>{{ group[1] }}</h2>
+                <p>Entrar al grupo</p>
+            </div>
+
+            <div class="card-arrow">
+                <i class="bi bi-arrow-right"></i>
+            </div>
+        </a>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h2>No hay grupos todavía</h2>
+            <p>Cuando existan grupos en la base de datos, aparecerán aquí.</p>
+        </div>
         {% endfor %}
     </section>
 </main>
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-modal">
+                <form method="POST" action="/group/create">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createGroupModalLabel">Crear nuevo grupo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del grupo</label>
+                            <input type="text" class="form-control modal-input" name="group_name"
+                                placeholder="Ej: Viaje a Madrid, Piso, Cena amigos..." required>
+                        </div>
+
+                        <div class="shared-box">
+                            <div class="shared-header">
+                                <div>
+                                    <h6>Invitar integrantes</h6>
+                                    <p>Selecciona los usuarios que formarán parte del grupo.</p>
+                                </div>
+                            </div>
+
+                            <div class="members-grid">
+                                {% for user in users %}
+                                <label class="member-check-card">
+                                    <input type="checkbox" name="invited_users" value="{{ user[0] }}">
+                                    <span class="member-orb"></span>
+
+                                    <span class="member-info">
+                                        <strong>{{ user[1] }}</strong>
+                                        <small>{{ user[2] }}</small>
+                                    </span>
+                                </label>
+                                {% else %}
+                                <div class="empty-users">
+                                    No hay usuarios disponibles para invitar.
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn btn-login text-white">
+                            <i class="bi bi-check-circle"></i>
+                            Crear grupo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}

@@ -119,7 +119,11 @@ def register():
             "error": str(ex)
         }), 500
 
-
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("Sesión cerrada correctamente")
+    return redirect(url_for('login_page'))
 
 @app.route('/main')
 def main():
@@ -146,9 +150,26 @@ def main():
         )
 
         groups = cursor.fetchall()
+
+        cursor.execute(
+            """
+            SELECT ID, NAME, EMAIL
+            FROM `users`
+            WHERE ID != %s
+            ORDER BY NAME
+            """,
+            (user_id,)
+        )
+
+        users = cursor.fetchall()
+
         cursor.close()
 
-        return render_template("main.html", groups=groups)
+        return render_template(
+            "main.html",
+            groups=groups,
+            users=users
+        )
 
     except Exception as ex:
         data["mensaje"] = "Error"
@@ -255,6 +276,61 @@ def group_detail(ID):
         data["mensaje"] = "Error"
         data["error"] = str(ex)
         return jsonify(data), 500
+
+@app.route('/group/create', methods=['POST'])
+def create_group():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    try:
+        creator_user = session['user_id']
+        group_name = request.form.get('group_name')
+        invited_users = request.form.getlist('invited_users')
+
+        if not group_name:
+            flash("El nombre del grupo es obligatorio")
+            return redirect(url_for('main'))
+
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO `groups`
+            (`NAME`, `CREATOR_USER`, `CREATION`)
+            VALUES (%s, %s, NOW())
+            """,
+            (group_name, creator_user)
+        )
+
+        group_id = cursor.lastrowid
+
+        for invited_user in invited_users:
+            invited_user = int(invited_user)
+
+            if invited_user == creator_user:
+                continue
+
+            cursor.execute(
+                """
+                INSERT INTO `group_users`
+                (`USER_INVITED`, `INVITE_USER`, `GROUP_ID`, `INVITE_TIME`)
+                VALUES (%s, %s, %s, NOW())
+                """,
+                (invited_user, creator_user, group_id)
+            )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        return redirect(url_for('group_detail', ID=group_id))
+
+    except Exception as ex:
+        conexion.connection.rollback()
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+
 
 @app.route('/group/<int:ID>/expense/create', methods=['POST'])
 def create_expense(ID):
@@ -413,7 +489,6 @@ def create_expense(ID):
             "error": str(ex)
         }), 500
     
-@app.route('/expense/<int:ID>/shared-users')
 @app.route('/expense/<int:ID>/shared-users')
 def get_expense_shared_users(ID):
     if 'user_id' not in session:
