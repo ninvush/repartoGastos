@@ -1,7 +1,8 @@
-from flask import Flask, render_template, jsonify,request, redirect, url_for
+from flask import Flask, render_template, jsonify,request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
 
 app = Flask(__name__)
+app.secret_key = "clave_temporal_para_desarrollo"
 
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
@@ -13,11 +14,116 @@ conexion = MySQL(app)
 
 
 @app.route('/')
-def login():
+def login_page():
     return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    try:
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT ID, NAME, EMAIL, PASSWORD
+            FROM `users`
+            WHERE EMAIL = %s OR NAME = %s
+            """,
+            (username, username)
+        )
+
+        user = cursor.fetchone()
+        cursor.close()
+
+        if user is None:
+            flash("Usuario o contraseña incorrectos")
+            return redirect(url_for('login_page'))
+
+        user_id = user[0]
+        user_name = user[1]
+        user_email = user[2]
+        user_password = user[3]
+
+        if password != user_password:
+            flash("Usuario o contraseña incorrectos")
+            return redirect(url_for('login_page'))
+
+        session['user_id'] = user_id
+        session['user_name'] = user_name
+        session['user_email'] = user_email
+
+        return redirect(url_for('main'))
+
+    except Exception as ex:
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+
+@app.route('/register', methods=['POST'])
+def register():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+
+    if not name or not email or not password or not confirm_password:
+        flash("Todos los campos son obligatorios")
+        return redirect(url_for('login_page'))
+
+    if password != confirm_password:
+        flash("Las contraseñas no coinciden")
+        return redirect(url_for('login_page'))
+
+    try:
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT ID
+            FROM `users`
+            WHERE EMAIL = %s OR NAME = %s
+            """,
+            (email, name)
+        )
+
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            cursor.close()
+            flash("Ese usuario o correo ya existe")
+            return redirect(url_for('login_page'))
+
+        cursor.execute(
+            """
+            INSERT INTO `users`
+            (`NAME`, `EMAIL`, `PASSWORD`)
+            VALUES (%s, %s, %s)
+            """,
+            (name, email, password)
+        )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        flash("Cuenta creada correctamente. Ya puedes iniciar sesión")
+        return redirect(url_for('login_page'))
+
+    except Exception as ex:
+        conexion.connection.rollback()
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+
+
 
 @app.route('/main')
 def main():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
     data = {}
 
     try:
@@ -35,6 +141,8 @@ def main():
 
 @app.route('/group/<int:ID>')
 def group_detail(ID):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
     data = {}
 
     try:
