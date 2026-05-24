@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify,request, redirect, url_for, session, flash
 from flask_mysqldb import MySQL
+from werkzeug.security import generate_password_hash,check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "clave_temporal_para_desarrollo"
@@ -11,7 +12,6 @@ app.config['MYSQL_DB'] = 'reparto_gastos'
 app.config['MYSQL_PORT'] = 3306
 
 conexion = MySQL(app)
-
 
 @app.route('/')
 def login_page():
@@ -46,7 +46,7 @@ def login():
         user_email = user[2]
         user_password = user[3]
 
-        if password != user_password:
+        if not check_password_hash(user_password, password):
             flash("Usuario o contraseña incorrectos")
             return redirect(url_for('login_page'))
 
@@ -68,6 +68,7 @@ def register():
     email = request.form.get('email')
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
+    hashed_password = generate_password_hash(password)
 
     if not name or not email or not password or not confirm_password:
         flash("Todos los campos son obligatorios")
@@ -102,7 +103,7 @@ def register():
             (`NAME`, `EMAIL`, `PASSWORD`)
             VALUES (%s, %s, %s)
             """,
-            (name, email, password)
+            (name, email, hashed_password)
         )
 
         conexion.connection.commit()
@@ -124,11 +125,26 @@ def register():
 def main():
     if 'user_id' not in session:
         return redirect(url_for('login_page'))
+
     data = {}
 
     try:
+        user_id = session['user_id']
+
         cursor = conexion.connection.cursor()
-        cursor.execute("SELECT ID,NAME FROM `groups`")
+
+        cursor.execute(
+            """
+            SELECT DISTINCT g.ID, g.NAME
+            FROM `groups` g
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE g.CREATOR_USER = %s
+               OR gu.USER_INVITED = %s
+            ORDER BY g.CREATION DESC
+            """,
+            (user_id, user_id)
+        )
+
         groups = cursor.fetchall()
         cursor.close()
 
@@ -137,7 +153,7 @@ def main():
     except Exception as ex:
         data["mensaje"] = "Error"
         data["error"] = str(ex)
-        return jsonify(data)
+        return jsonify(data), 500
 
 @app.route('/group/<int:ID>')
 def group_detail(ID):
@@ -146,23 +162,34 @@ def group_detail(ID):
     data = {}
 
     try:
+        user_id = session['user_id']
         cursor = conexion.connection.cursor()
 
-        # Datos del grupo
+        # Datos del grupo, pero solo si el usuario pertenece
         cursor.execute(
-            "SELECT ID, NAME, CREATOR_USER FROM `groups` WHERE ID = %s",
-            (ID,)
+            """
+            SELECT g.ID, g.NAME, g.CREATOR_USER
+            FROM `groups` g
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE g.ID = %s
+              AND (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                  )
+            LIMIT 1
+            """,
+            (ID, user_id, user_id)
         )
+
         group = cursor.fetchone()
 
         if group is None:
             cursor.close()
             return jsonify({
                 "mensaje": "Error",
-                "error": "Grupo no encontrado"
-            }), 404
+                "error": "No tienes permiso para ver este grupo o el grupo no existe"
+            }), 403
 
-        # Gastos del grupo
         cursor.execute(
             """
             SELECT 
@@ -175,10 +202,17 @@ def group_detail(ID):
                 e.GOOGLE_API
             FROM `expenses` e
             INNER JOIN `users` u ON e.USER_ID = u.ID
+            INNER JOIN `groups` g ON e.GROUP_ID = g.ID
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
             WHERE e.GROUP_ID = %s
+            AND (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                )
+            GROUP BY e.ID, e.NAME, e.AMOUNT, e.EXPENSE_DATE, u.NAME, e.USER_ID, e.GOOGLE_API
             ORDER BY e.EXPENSE_DATE DESC
             """,
-            (ID,)
+            (ID, user_id, user_id)
         )
         expenses = cursor.fetchall()
 
@@ -224,18 +258,51 @@ def group_detail(ID):
 
 @app.route('/group/<int:ID>/expense/create', methods=['POST'])
 def create_expense(ID):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
     data = {}
 
     try:
         expense_id = request.form.get('expense_id')
+
         if expense_id:
             expense_id = int(expense_id)
+
         name = request.form.get('name')
         amount = request.form.get('amount')
         paid_by = request.form.get('paid_by')
         expense_date = request.form.get('expense_date')
         google_api = request.form.get('google_api') or ''
         shared_users = request.form.getlist('shared_users')
+
+        cursor = conexion.connection.cursor()
+
+        logged_user_id = session['user_id']
+
+        cursor.execute(
+            """
+            SELECT g.ID
+            FROM `groups` g
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE g.ID = %s
+              AND (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                  )
+            LIMIT 1
+            """,
+            (ID, logged_user_id, logged_user_id)
+        )
+
+        has_access = cursor.fetchone()
+
+        if has_access is None:
+            cursor.close()
+            return jsonify({
+                "mensaje": "Error",
+                "error": "No tienes permiso para modificar este grupo"
+            }), 403
 
         if not name or not amount or not paid_by or not expense_date:
             return jsonify({
@@ -347,9 +414,41 @@ def create_expense(ID):
         }), 500
     
 @app.route('/expense/<int:ID>/shared-users')
+@app.route('/expense/<int:ID>/shared-users')
 def get_expense_shared_users(ID):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
     try:
+        user_id = session['user_id']
         cursor = conexion.connection.cursor()
+
+        # Comprobar que el usuario tiene acceso al grupo del gasto
+        cursor.execute(
+            """
+            SELECT e.ID
+            FROM `expenses` e
+            INNER JOIN `groups` g ON e.GROUP_ID = g.ID
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE e.ID = %s
+              AND (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                  )
+            LIMIT 1
+            """,
+            (ID, user_id, user_id)
+        )
+
+        allowed_expense = cursor.fetchone()
+
+        if allowed_expense is None:
+            cursor.close()
+            return jsonify({
+                "mensaje": "Error",
+                "error": "No tienes permiso para ver este gasto"
+            }), 403
+
         cursor.execute(
             """
             SELECT USER_ID
@@ -358,6 +457,7 @@ def get_expense_shared_users(ID):
             """,
             (ID,)
         )
+
         users = [row[0] for row in cursor.fetchall()]
         cursor.close()
 
