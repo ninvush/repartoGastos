@@ -331,6 +331,129 @@ def create_group():
             "error": str(ex)
         }), 500
 
+def recalculate_group_debts(cursor, group_id):
+    """
+    Recalcula todas las deudas de un grupo desde cero.
+
+    Lógica:
+    - Si un usuario pagó un gasto, se le suma ese importe como crédito.
+    - Si un usuario participa en expense_shared, se le resta su parte.
+    - Balance positivo: le deben dinero.
+    - Balance negativo: debe dinero.
+    - debts.FROM_USER = quien debe
+    - debts.TO_USER = a quien se le debe
+    """
+
+    # Obtener nombre del grupo
+    cursor.execute(
+        """
+        SELECT NAME
+        FROM `groups`
+        WHERE ID = %s
+        """,
+        (group_id,)
+    )
+
+    group = cursor.fetchone()
+
+    if group is None:
+        raise Exception("Grupo no encontrado al recalcular deudas")
+
+    group_name = group[0]
+
+    # Borrar deudas anteriores de este grupo
+    cursor.execute(
+        """
+        DELETE FROM `debts`
+        WHERE GROUP_ID = %s
+        """,
+        (group_id,)
+    )
+
+    # Obtener balances por usuario
+    cursor.execute(
+        """
+        SELECT 
+            user_movements.USER_ID,
+            ROUND(SUM(user_movements.BALANCE), 2) AS BALANCE
+        FROM (
+            -- Dinero pagado por cada usuario
+            SELECT 
+                e.USER_ID AS USER_ID,
+                e.AMOUNT AS BALANCE
+            FROM `expenses` e
+            WHERE e.GROUP_ID = %s
+
+            UNION ALL
+
+            -- Parte que corresponde pagar a cada usuario
+            SELECT 
+                es.USER_ID AS USER_ID,
+                -es.AMOUNT AS BALANCE
+            FROM `expense_shared` es
+            INNER JOIN `expenses` e ON es.EXPENSE_ID = e.ID
+            WHERE e.GROUP_ID = %s
+        ) AS user_movements
+        GROUP BY user_movements.USER_ID
+        HAVING ROUND(SUM(user_movements.BALANCE), 2) != 0
+        """,
+        (group_id, group_id)
+    )
+
+    balances_rows = cursor.fetchall()
+
+    creditors = []
+    debtors = []
+
+    for user_id, balance in balances_rows:
+        balance = float(balance)
+
+        if balance > 0:
+            creditors.append({
+                "user_id": user_id,
+                "amount": round(balance, 2)
+            })
+        elif balance < 0:
+            debtors.append({
+                "user_id": user_id,
+                "amount": round(abs(balance), 2)
+            })
+
+    # Crear deudas compensadas
+    i = 0
+    j = 0
+
+    while i < len(debtors) and j < len(creditors):
+        debtor = debtors[i]
+        creditor = creditors[j]
+
+        amount = min(debtor["amount"], creditor["amount"])
+        amount = round(amount, 2)
+
+        if amount > 0:
+            cursor.execute(
+                """
+                INSERT INTO `debts`
+                (`FROM_USER`, `TO_USER`, `AMOUNT`, `GROUP_ID`, `GROUP_NAME`, `CREATION_TIME`, `MODIFICATION_TIME`)
+                VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+                """,
+                (
+                    debtor["user_id"],
+                    creditor["user_id"],
+                    amount,
+                    group_id,
+                    group_name
+                )
+            )
+
+        debtor["amount"] = round(debtor["amount"] - amount, 2)
+        creditor["amount"] = round(creditor["amount"] - amount, 2)
+
+        if debtor["amount"] <= 0:
+            i += 1
+
+        if creditor["amount"] <= 0:
+            j += 1
 
 @app.route('/group/<int:ID>/expense/create', methods=['POST'])
 def create_expense(ID):
@@ -395,8 +518,6 @@ def create_expense(ID):
         amount = float(amount)
         paid_by = int(paid_by)
         shared_users = [int(user_id) for user_id in shared_users]
-
-        cursor = conexion.connection.cursor()
 
         cursor.execute(
             """
@@ -465,17 +586,26 @@ def create_expense(ID):
 
             expense_id = cursor.lastrowid
 
-        shared_amount = round(amount / len(shared_users), 2)
+        base_amount = round(amount / len(shared_users), 2)
+        amounts = [base_amount] * len(shared_users)
 
-        for user_id in shared_users:
+        difference = round(amount - sum(amounts), 2)
+
+        if difference != 0:
+            amounts[0] = round(amounts[0] + difference, 2)
+
+        for user_id, user_share in zip(shared_users, amounts):
             cursor.execute(
                 """
                 INSERT INTO `expense_shared`
                 (`EXPENSE_ID`, `USER_ID`, `AMOUNT`)
                 VALUES (%s, %s, %s)
                 """,
-                (expense_id, user_id, shared_amount)
+                (expense_id, user_id, user_share)
             )
+
+        # Recalcular deudas del grupo después de crear/editar el gasto
+        recalculate_group_debts(cursor, ID)
 
         conexion.connection.commit()
         cursor.close()
