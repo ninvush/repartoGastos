@@ -1,0 +1,96 @@
+{% extends "index.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/debts.css') }}">
+{% endblock %}
+
+{% block content %}
+<div id="bg-animation"></div>
+
+<main class="debts-wrapper">
+    <section class="debts-header">
+        <div class="header-actions">
+            <a href="/main" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                Volver a grupos
+            </a>
+
+            <a href="/logout" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i>
+                Cerrar sesión
+            </a>
+        </div>
+
+        <div class="header-icon">
+            <i class="bi bi-pie-chart"></i>
+        </div>
+
+        <h1>Deudas</h1>
+        <p>Resumen visual de lo que debe cada persona por grupo.</p>
+    </section>
+
+    <section class="debts-grid">
+        {% for group in groups_debts %}
+        <article class="debt-card">
+            <div class="debt-card-header">
+                <div>
+                    <h2>{{ group["name"] }}</h2>
+                    <p>{{ group["items"]|length }} deuda(s) pendiente(s)</p>
+                </div>
+
+                <a href="/group/{{ group['id'] }}" class="btn-open-group">
+                    <i class="bi bi-arrow-up-right"></i>
+                </a>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="chart-group-{{ group['id'] }}"></canvas>
+            </div>
+
+            <div class="debts-list">
+                {% for debt in group["items"] %}
+                <div class="debt-row">
+                    <div>
+                        {% if debt["is_debtor"] %}
+                        <strong>Debes a {{ debt["to_user_name"] }}</strong>
+                        <span>Pago pendiente</span>
+                        {% elif debt["is_creditor"] %}
+                        <strong>{{ debt["from_user_name"] }} te debe</strong>
+                        <span>Dinero pendiente de recibir</span>
+                        {% endif %}
+                    </div>
+
+                    <b>{{ "%.2f"|format(debt["amount"]) }} €</b>
+                </div>
+                {% endfor %}
+            </div>
+        </article>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-check-circle"></i>
+            <h2>No hay deudas pendientes</h2>
+            <p>Cuando crees gastos y repartos, aparecerán aquí.</p>
+        </div>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}
+
+{% block js %}
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    window.groupsDebts = {{ groups_debts | tojson }};
+</script>
+
+<script type="module" src="{{ url_for('static', filename='scripts/debts.js') }}"></script>
+{% endblock %}

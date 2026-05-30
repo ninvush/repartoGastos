@@ -252,7 +252,8 @@ canvas {
 }
 
 .btn-create-group,
-.btn-logout {
+.btn-logout,
+.btn-debts {
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -262,6 +263,21 @@ canvas {
     color: white;
     font-weight: 700;
     transition: 0.25s ease;
+}
+
+.btn-debts {
+    padding: 10px 16px;
+    margin-right: 10px;
+    background: rgba(0, 191, 255, 0.12);
+    border: 1px solid rgba(0, 191, 255, 0.24);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-debts:hover {
+    color: white;
+    transform: translateY(-2px);
+    background: rgba(0, 191, 255, 0.2);
 }
 
 .btn-create-group {

@@ -1,0 +1,291 @@
+html,
+body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+body {
+    background: #000;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    position: relative;
+    isolation: isolate;
+}
+
+#bg-animation {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: #000;
+    pointer-events: none;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at top, rgba(138, 43, 226, 0.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(0, 191, 255, 0.14), transparent 35%),
+        rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+}
+
+.debts-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    width: 100%;
+    padding: 70px 24px;
+}
+
+.debts-header {
+    text-align: center;
+    margin-bottom: 45px;
+    position: relative;
+}
+
+.header-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-back,
+.btn-logout,
+.btn-open-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: none;
+    text-decoration: none;
+    border-radius: 999px;
+    color: white;
+    font-weight: 700;
+    transition: 0.25s ease;
+}
+
+.btn-back,
+.btn-logout {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-back:hover,
+.btn-logout:hover,
+.btn-open-group:hover {
+    color: white;
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.header-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 35px rgba(0, 191, 255, 0.25);
+}
+
+.header-icon i {
+    font-size: 34px;
+}
+
+.debts-header h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 800;
+    margin: 0;
+}
+
+.debts-header p {
+    margin-top: 12px;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.debts-grid {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 24px;
+}
+
+.debt-card {
+    position: relative;
+    padding: 24px;
+    border-radius: 28px;
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.debt-card::before {
+    content: "";
+    position: absolute;
+    inset: -45%;
+    background: conic-gradient(
+        from 120deg,
+        transparent,
+        rgba(0, 191, 255, 0.25),
+        transparent,
+        rgba(138, 43, 226, 0.25),
+        transparent,
+        rgba(221, 36, 118, 0.22),
+        transparent
+    );
+    opacity: 0.35;
+    animation: rotateGlow 12s linear infinite;
+}
+
+.debt-card::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 27px;
+    background: rgba(8, 9, 14, 0.82);
+    z-index: 1;
+}
+
+.debt-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.debt-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.debt-card-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.debt-card-header p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.62);
+}
+
+.btn-open-group {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    box-shadow: 0 0 18px rgba(0, 191, 255, 0.28);
+}
+
+.chart-box {
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto 24px;
+}
+
+.debts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.debt-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.065);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.debt-row strong {
+    display: block;
+    font-size: 0.95rem;
+}
+
+.debt-row span {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.58);
+}
+
+.debt-row b {
+    white-space: nowrap;
+    color: white;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 54px 24px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.075);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.empty-state i {
+    font-size: 48px;
+    opacity: 0.8;
+}
+
+.empty-state h2 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.68);
+}
+
+canvas {
+    display: block;
+}
+
+@keyframes rotateGlow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 700px) {
+    .debts-wrapper {
+        padding: 100px 16px 40px;
+    }
+
+    .header-actions {
+        position: static;
+        justify-content: center;
+        margin-bottom: 22px;
+    }
+}

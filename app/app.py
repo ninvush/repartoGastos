@@ -333,18 +333,18 @@ def create_group():
 
 def recalculate_group_debts(cursor, group_id):
     """
-    Recalcula todas las deudas de un grupo desde cero.
+    Recalcula las deudas de un grupo compensando deudas cruzadas por pareja.
 
-    Lógica:
-    - Si un usuario pagó un gasto, se le suma ese importe como crédito.
-    - Si un usuario participa en expense_shared, se le resta su parte.
-    - Balance positivo: le deben dinero.
-    - Balance negativo: debe dinero.
-    - debts.FROM_USER = quien debe
-    - debts.TO_USER = a quien se le debe
+    Ejemplo:
+    - Sergio debe a Claudia 500
+    - Claudia debe a Sergio 320
+
+    Resultado:
+    - Sergio debe a Claudia 180
+
+    Solo compensa dentro del mismo grupo.
     """
 
-    # Obtener nombre del grupo
     cursor.execute(
         """
         SELECT NAME
@@ -361,7 +361,6 @@ def recalculate_group_debts(cursor, group_id):
 
     group_name = group[0]
 
-    # Borrar deudas anteriores de este grupo
     cursor.execute(
         """
         DELETE FROM `debts`
@@ -370,90 +369,76 @@ def recalculate_group_debts(cursor, group_id):
         (group_id,)
     )
 
-    # Obtener balances por usuario
     cursor.execute(
         """
-        SELECT 
-            user_movements.USER_ID,
-            ROUND(SUM(user_movements.BALANCE), 2) AS BALANCE
-        FROM (
-            -- Dinero pagado por cada usuario
-            SELECT 
-                e.USER_ID AS USER_ID,
-                e.AMOUNT AS BALANCE
-            FROM `expenses` e
-            WHERE e.GROUP_ID = %s
-
-            UNION ALL
-
-            -- Parte que corresponde pagar a cada usuario
-            SELECT 
-                es.USER_ID AS USER_ID,
-                -es.AMOUNT AS BALANCE
-            FROM `expense_shared` es
-            INNER JOIN `expenses` e ON es.EXPENSE_ID = e.ID
-            WHERE e.GROUP_ID = %s
-        ) AS user_movements
-        GROUP BY user_movements.USER_ID
-        HAVING ROUND(SUM(user_movements.BALANCE), 2) != 0
+        SELECT
+            es.USER_ID AS FROM_USER,
+            e.USER_ID AS TO_USER,
+            ROUND(SUM(es.AMOUNT), 2) AS AMOUNT
+        FROM `expense_shared` es
+        INNER JOIN `expenses` e ON es.EXPENSE_ID = e.ID
+        WHERE e.GROUP_ID = %s
+          AND es.USER_ID != e.USER_ID
+        GROUP BY es.USER_ID, e.USER_ID
+        HAVING ROUND(SUM(es.AMOUNT), 2) > 0
         """,
-        (group_id, group_id)
+        (group_id,)
     )
 
-    balances_rows = cursor.fetchall()
+    raw_debts = cursor.fetchall()
 
-    creditors = []
-    debtors = []
+    pair_balances = {}
 
-    for user_id, balance in balances_rows:
-        balance = float(balance)
+    for from_user, to_user, amount in raw_debts:
+        from_user = int(from_user)
+        to_user = int(to_user)
+        amount = round(float(amount), 2)
+
+        # Creamos una clave común para la pareja, sin importar dirección.
+        # Ejemplo: Sergio-Claudia y Claudia-Sergio usan la misma clave.
+        user_a = min(from_user, to_user)
+        user_b = max(from_user, to_user)
+        pair_key = (user_a, user_b)
+
+        if pair_key not in pair_balances:
+            pair_balances[pair_key] = 0.0
+
+        # Si la deuda va del menor ID al mayor ID, suma.
+        # Si va del mayor ID al menor ID, resta.
+        if from_user == user_a and to_user == user_b:
+            pair_balances[pair_key] += amount
+        else:
+            pair_balances[pair_key] -= amount
+
+    for (user_a, user_b), balance in pair_balances.items():
+        balance = round(balance, 2)
+
+        if balance == 0:
+            continue
 
         if balance > 0:
-            creditors.append({
-                "user_id": user_id,
-                "amount": round(balance, 2)
-            })
-        elif balance < 0:
-            debtors.append({
-                "user_id": user_id,
-                "amount": round(abs(balance), 2)
-            })
+            from_user = user_a
+            to_user = user_b
+            final_amount = balance
+        else:
+            from_user = user_b
+            to_user = user_a
+            final_amount = abs(balance)
 
-    # Crear deudas compensadas
-    i = 0
-    j = 0
-
-    while i < len(debtors) and j < len(creditors):
-        debtor = debtors[i]
-        creditor = creditors[j]
-
-        amount = min(debtor["amount"], creditor["amount"])
-        amount = round(amount, 2)
-
-        if amount > 0:
-            cursor.execute(
-                """
-                INSERT INTO `debts`
-                (`FROM_USER`, `TO_USER`, `AMOUNT`, `GROUP_ID`, `GROUP_NAME`, `CREATION_TIME`, `MODIFICATION_TIME`)
-                VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
-                """,
-                (
-                    debtor["user_id"],
-                    creditor["user_id"],
-                    amount,
-                    group_id,
-                    group_name
-                )
+        cursor.execute(
+            """
+            INSERT INTO `debts`
+            (`FROM_USER`, `TO_USER`, `AMOUNT`, `GROUP_ID`, `GROUP_NAME`, `CREATION_TIME`, `MODIFICATION_TIME`)
+            VALUES (%s, %s, %s, %s, %s, NOW(), NOW())
+            """,
+            (
+                from_user,
+                to_user,
+                round(final_amount, 2),
+                group_id,
+                group_name
             )
-
-        debtor["amount"] = round(debtor["amount"] - amount, 2)
-        creditor["amount"] = round(creditor["amount"] - amount, 2)
-
-        if debtor["amount"] <= 0:
-            i += 1
-
-        if creditor["amount"] <= 0:
-            j += 1
+        )
 
 @app.route('/group/<int:ID>/expense/create', methods=['POST'])
 def create_expense(ID):
@@ -669,6 +654,97 @@ def get_expense_shared_users(ID):
         return jsonify({
             "users": users
         })
+
+    except Exception as ex:
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+    
+@app.route('/debts')
+def debts():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    
+    print("USUARIO LOGUEADO:", session['user_id'], session.get('user_name'))
+
+    try:
+        user_id = session['user_id']
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT 
+                d.GROUP_ID,
+                d.GROUP_NAME,
+                d.FROM_USER,
+                from_user.NAME AS FROM_USER_NAME,
+                d.TO_USER,
+                to_user.NAME AS TO_USER_NAME,
+                d.AMOUNT
+            FROM `debts` d
+            INNER JOIN `users` from_user ON d.FROM_USER = from_user.ID
+            INNER JOIN `users` to_user ON d.TO_USER = to_user.ID
+            INNER JOIN `groups` g ON d.GROUP_ID = g.ID
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                  )
+              AND (
+                    d.FROM_USER = %s
+                    OR d.TO_USER = %s
+                  )
+            GROUP BY 
+                d.ID,
+                d.GROUP_ID,
+                d.GROUP_NAME,
+                d.FROM_USER,
+                from_user.NAME,
+                d.TO_USER,
+                to_user.NAME,
+                d.AMOUNT
+            ORDER BY d.GROUP_NAME, d.AMOUNT DESC
+            """,
+            (user_id, user_id, user_id, user_id)
+        )
+
+        debts_rows = cursor.fetchall()
+        cursor.close()
+
+        groups_debts = {}
+
+        for row in debts_rows:
+            group_id = row[0]
+            group_name = row[1]
+            from_user_id = row[2]
+            from_user_name = row[3]
+            to_user_id = row[4]
+            to_user_name = row[5]
+            amount = float(row[6])
+
+            if group_id not in groups_debts:
+                groups_debts[group_id] = {
+                    "id": group_id,
+                    "name": group_name,
+                    "items": []
+                }
+
+            groups_debts[group_id]["items"].append({
+                "from_user_id": from_user_id,
+                "from_user_name": from_user_name,
+                "to_user_id": to_user_id,
+                "to_user_name": to_user_name,
+                "amount": amount,
+                "is_debtor": from_user_id == user_id,
+                "is_creditor": to_user_id == user_id
+            })
+
+        return render_template(
+            "debts.html",
+            groups_debts=list(groups_debts.values()),
+            current_user_id=user_id
+        )
 
     except Exception as ex:
         return jsonify({
