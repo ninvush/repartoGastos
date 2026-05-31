@@ -141,11 +141,15 @@ def main():
 
         cursor.execute(
             """
-            SELECT DISTINCT g.ID, g.NAME
+            SELECT g.ID, g.NAME
             FROM `groups` g
-            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
             WHERE g.CREATOR_USER = %s
-               OR gu.USER_INVITED = %s
+               OR EXISTS (
+                    SELECT 1
+                    FROM `group_users` gu
+                    WHERE gu.GROUP_ID = g.ID
+                      AND gu.USER_INVITED = %s
+               )
             ORDER BY g.CREATION DESC
             """,
             (user_id, user_id)
