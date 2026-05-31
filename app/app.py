@@ -69,7 +69,6 @@ def register():
     email = request.form.get('email')
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
-    hashed_password = generate_password_hash(password)
 
     if not name or not email or not password or not confirm_password:
         flash("Todos los campos son obligatorios")
@@ -78,6 +77,8 @@ def register():
     if password != confirm_password:
         flash("Las contraseñas no coinciden")
         return redirect(url_for('login_page'))
+
+    hashed_password = generate_password_hash(password)
 
     try:
         cursor = conexion.connection.cursor()
