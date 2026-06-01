@@ -2,8 +2,13 @@ from flask import Flask, render_template, jsonify,request, redirect, url_for, se
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash,check_password_hash
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+
+
+load_dotenv()
+
 app.secret_key = os.environ.get("SECRET_KEY", "clave_temporal_para_desarrollo")
 
 app.config['MYSQL_HOST'] = os.environ.get("MYSQL_HOST", "127.0.0.1")
