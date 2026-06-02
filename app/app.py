@@ -280,7 +280,8 @@ def group_detail(ID):
             "group_detail.html",
             group=group,
             expenses=expenses,
-            members=members
+            members=members,
+            current_user_id=user_id
         )
 
     except Exception as ex:
@@ -451,6 +452,81 @@ def recalculate_group_debts(cursor, group_id):
             )
         )
 
+@app.route('/debts/settle', methods=['POST'])
+def settle_debt():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    try:
+        user_id = session['user_id']
+
+        group_id = request.form.get('group_id')
+        to_user_id = request.form.get('to_user_id')
+
+        if not group_id or not to_user_id:
+            return jsonify({
+                "mensaje": "Error",
+                "error": "Faltan datos para saldar la deuda"
+            }), 400
+
+        group_id = int(group_id)
+        to_user_id = int(to_user_id)
+
+        cursor = conexion.connection.cursor()
+
+        # Seguridad: comprobar que el usuario pertenece al grupo
+        cursor.execute(
+            """
+            SELECT g.ID
+            FROM `groups` g
+            LEFT JOIN `group_users` gu ON gu.GROUP_ID = g.ID
+            WHERE g.ID = %s
+              AND (
+                    g.CREATOR_USER = %s
+                    OR gu.USER_INVITED = %s
+                  )
+            LIMIT 1
+            """,
+            (group_id, user_id, user_id)
+        )
+
+        has_access = cursor.fetchone()
+
+        if has_access is None:
+            cursor.close()
+            return jsonify({
+                "mensaje": "Error",
+                "error": "No tienes permiso para saldar deudas en este grupo"
+            }), 403
+
+        # Borra solo la deuda donde el usuario logueado debe a esa persona
+        cursor.execute(
+            """
+            DELETE FROM `debts`
+            WHERE GROUP_ID = %s
+              AND FROM_USER = %s
+              AND TO_USER = %s
+            """,
+            (group_id, user_id, to_user_id)
+        )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        flash("Deuda saldada correctamente")
+        return redirect(url_for('debts'))
+
+    except Exception as ex:
+        try:
+            conexion.connection.rollback()
+        except Exception:
+            pass
+
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+
 @app.route('/group/<int:ID>/expense/create', methods=['POST'])
 def create_expense(ID):
     if 'user_id' not in session:
@@ -614,7 +690,122 @@ def create_expense(ID):
             "mensaje": "Error",
             "error": str(ex)
         }), 500
-    
+
+@app.route('/group/<int:ID>/delete', methods=['POST'])
+def delete_group(ID):
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+
+    try:
+        user_id = session['user_id']
+        cursor = conexion.connection.cursor()
+
+        # Comprobar que el grupo existe y que el usuario logueado es el creador
+        cursor.execute(
+            """
+            SELECT ID, NAME, CREATOR_USER
+            FROM `groups`
+            WHERE ID = %s
+            """,
+            (ID,)
+        )
+
+        group = cursor.fetchone()
+
+        if group is None:
+            cursor.close()
+            flash("El grupo no existe")
+            return redirect(url_for('main'))
+
+        group_creator = group[2]
+
+        if group_creator != user_id:
+            cursor.close()
+            flash("Solo el creador del grupo puede borrarlo")
+            return redirect(url_for('group_detail', ID=ID))
+
+        # Comprobar si hay deudas pendientes del grupo
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM `debts`
+            WHERE GROUP_ID = %s
+            """,
+            (ID,)
+        )
+
+        pending_debts = cursor.fetchone()[0]
+
+        if pending_debts > 0:
+            cursor.close()
+            flash("No puedes borrar este grupo porque todavía tiene deudas pendientes")
+            return redirect(url_for('group_detail', ID=ID))
+
+        # Borrar repartos de gastos del grupo
+        cursor.execute(
+            """
+            DELETE es
+            FROM `expense_shared` es
+            INNER JOIN `expenses` e ON es.EXPENSE_ID = e.ID
+            WHERE e.GROUP_ID = %s
+            """,
+            (ID,)
+        )
+
+        # Borrar gastos del grupo
+        cursor.execute(
+            """
+            DELETE FROM `expenses`
+            WHERE GROUP_ID = %s
+            """,
+            (ID,)
+        )
+
+        # Borrar usuarios invitados al grupo
+        cursor.execute(
+            """
+            DELETE FROM `group_users`
+            WHERE GROUP_ID = %s
+            """,
+            (ID,)
+        )
+
+        # Por seguridad, borrar debts si no hubiera ninguna pendiente.
+        # Normalmente no borrará nada porque ya comprobamos que COUNT = 0.
+        cursor.execute(
+            """
+            DELETE FROM `debts`
+            WHERE GROUP_ID = %s
+            """,
+            (ID,)
+        )
+
+        # Borrar grupo
+        cursor.execute(
+            """
+            DELETE FROM `groups`
+            WHERE ID = %s
+            """,
+            (ID,)
+        )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        flash("Grupo eliminado correctamente")
+        return redirect(url_for('main'))
+
+    except Exception as ex:
+        try:
+            conexion.connection.rollback()
+        except Exception:
+            pass
+
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+
 @app.route('/expense/<int:ID>/shared-users')
 def get_expense_shared_users(ID):
     if 'user_id' not in session:

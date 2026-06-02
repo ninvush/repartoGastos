@@ -21,11 +21,31 @@
         <h1>{{ group[1] }}</h1>
         <p>Gastos asociados a este grupo</p>
 
-        <button type="button" class="btn-create-expense" id="openCreateExpenseBtn" data-bs-toggle="modal"
-            data-bs-target="#createExpenseModal">
-            <i class="bi bi-plus-circle"></i>
-            Crear gasto
-        </button>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-warning text-center mt-3">
+            {{ messages[0] }}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="group-actions">
+            <button type="button" class="btn-create-expense" id="openCreateExpenseBtn" data-bs-toggle="modal"
+                data-bs-target="#createExpenseModal">
+                <i class="bi bi-plus-circle"></i>
+                Crear gasto
+            </button>
+
+            {% if group[2]|int == current_user_id|int %}
+            <form method="POST" action="/group/{{ group[0] }}/delete"
+                onsubmit="return confirm('¿Seguro que quieres borrar este grupo? Solo se puede borrar si no tiene deudas pendientes.');">
+                <button type="submit" class="btn-delete-group">
+                    <i class="bi bi-trash"></i>
+                    Borrar grupo
+                </button>
+            </form>
+            {% endif %}
+        </div>
     </section>
 
     <section class="expenses-grid">

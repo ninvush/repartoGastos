@@ -50,7 +50,7 @@
             <div class="debts-list">
                 {% for debt in group["items"] %}
                 <div class="debt-row">
-                    <div>
+                    <div class="debt-info">
                         {% if debt["is_debtor"] %}
                         <strong>Debes a {{ debt["to_user_name"] }}</strong>
                         <span>Pago pendiente</span>
@@ -60,7 +60,22 @@
                         {% endif %}
                     </div>
 
-                    <b>{{ "%.2f"|format(debt["amount"]) }} €</b>
+                    <div class="debt-actions">
+                        <b>{{ "%.2f"|format(debt["amount"]) }} €</b>
+
+                        {% if debt["is_debtor"] %}
+                        <form method="POST" action="/debts/settle"
+                            onsubmit="return confirm('¿Seguro que quieres saldar esta deuda?');">
+                            <input type="hidden" name="group_id" value="{{ group['id'] }}">
+                            <input type="hidden" name="to_user_id" value="{{ debt['to_user_id'] }}">
+
+                            <button type="submit" class="btn-settle-debt">
+                                <i class="bi bi-check-circle"></i>
+                                Saldar deuda
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
