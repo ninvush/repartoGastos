@@ -12,13 +12,13 @@
         </div>
         <h2>Iniciar Sesión</h2>
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} text-center">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} text-center">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <form method="POST" action="/login">
@@ -45,6 +45,12 @@
 
         <div class="extra-links mt-3">
             <p>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </p>
+
+            <p>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
                     Crear cuenta
                 </a>
@@ -67,8 +73,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Nombre de usuario</label>
-                        <input type="text" class="form-control register-input" name="name"
-                            placeholder="Ej: Manu" required>
+                        <input type="text" class="form-control register-input" name="name" placeholder="Ej: Manu"
+                            required>
                     </div>
 
                     <div class="mb-3">
@@ -98,6 +104,44 @@
                     <button type="submit" class="btn btn-login text-white">
                         <i class="bi bi-person-plus"></i>
                         Crear cuenta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content register-modal">
+            <form method="POST" action="/forgot-password">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">
+                        Recuperar contraseña
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-white-50">
+                        Introduce tu correo y te enviaremos un enlace para crear una nueva contraseña.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control register-input" name="email"
+                            placeholder="correo@email.com" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-login text-white">
+                        <i class="bi bi-envelope"></i>
+                        Enviar enlace
                     </button>
                 </div>
             </form>

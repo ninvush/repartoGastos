@@ -2,6 +2,9 @@ from flask import Flask, render_template, jsonify,request, redirect, url_for, se
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash,check_password_hash
 import os
+import secrets
+from datetime import datetime, timedelta
+from flask_mail import Mail, Message
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -16,6 +19,15 @@ app.config['MYSQL_USER'] = os.environ.get("MYSQL_USER", "root")
 app.config['MYSQL_PASSWORD'] = os.environ.get("MYSQL_PASSWORD", "")
 app.config['MYSQL_DB'] = os.environ.get("MYSQL_DB", "reparto_gastos")
 app.config['MYSQL_PORT'] = int(os.environ.get("MYSQL_PORT", 3306))
+
+app.config['MAIL_SERVER'] = os.environ.get("MAIL_SERVER")
+app.config['MAIL_PORT'] = int(os.environ.get("MAIL_PORT", 587))
+app.config['MAIL_USE_TLS'] = os.environ.get("MAIL_USE_TLS", "true").lower() == "true"
+app.config['MAIL_USERNAME'] = os.environ.get("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.environ.get("MAIL_PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get("MAIL_DEFAULT_SENDER")
+
+mail = Mail(app)
 
 conexion = MySQL(app)
 
@@ -186,6 +198,181 @@ def main():
         data["mensaje"] = "Error"
         data["error"] = str(ex)
         return jsonify(data), 500
+    
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    email = request.form.get('email')
+
+    if not email:
+        flash("Introduce un correo electrónico", "danger")
+        return redirect(url_for('login_page'))
+
+    try:
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT ID, NAME, EMAIL
+            FROM `users`
+            WHERE EMAIL = %s
+            """,
+            (email,)
+        )
+
+        user = cursor.fetchone()
+
+        # Mensaje genérico por seguridad
+        if user is None:
+            cursor.close()
+            flash("Si el correo existe, recibirás un enlace para restablecer la contraseña", "success")
+            return redirect(url_for('login_page'))
+
+        user_id = user[0]
+        user_name = user[1]
+        user_email = user[2]
+
+        token = secrets.token_urlsafe(48)
+        expiration_time = datetime.now() + timedelta(minutes=30)
+
+        cursor.execute(
+            """
+            INSERT INTO password_resets
+            (USER_ID, TOKEN, EXPIRATION_TIME)
+            VALUES (%s, %s, %s)
+            """,
+            (user_id, token, expiration_time)
+        )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        base_url = os.environ.get("APP_BASE_URL", "http://127.0.0.1:5000")
+        reset_link = f"{base_url}/reset-password/{token}"
+
+        msg = Message(
+            subject="Restablecer contraseña",
+            recipients=[user_email]
+        )
+
+        msg.body = f"""
+                Buenas {user_name},
+
+                Has solicitado restablecer tu contraseña.
+
+                Pulsa en este enlace para crear una nueva contraseña:
+
+                {reset_link}
+
+                Este enlace caduca en 30 minutos.
+
+                Si no has solicitado este cambio, puedes ignorar este correo o notificar al creador de la aplicación.
+                """
+
+        mail.send(msg)
+
+        flash("Si el correo existe, recibirás un enlace para restablecer la contraseña", "success")
+        return redirect(url_for('login_page'))
+
+    except Exception as ex:
+        try:
+            conexion.connection.rollback()
+        except Exception:
+            pass
+
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
+    
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        cursor = conexion.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT ID, USER_ID, EXPIRATION_TIME, USED
+            FROM password_resets
+            WHERE TOKEN = %s
+            """,
+            (token,)
+        )
+
+        reset_request = cursor.fetchone()
+
+        if reset_request is None:
+            cursor.close()
+            flash("El enlace no es válido", "danger")
+            return redirect(url_for('login_page'))
+
+        reset_id = reset_request[0]
+        user_id = reset_request[1]
+        expiration_time = reset_request[2]
+        used = reset_request[3]
+
+        if used:
+            cursor.close()
+            flash("Este enlace ya fue utilizado", "danger")
+            return redirect(url_for('login_page'))
+
+        if datetime.now() > expiration_time:
+            cursor.close()
+            flash("El enlace ha caducado", "danger")
+            return redirect(url_for('login_page'))
+
+        if request.method == 'GET':
+            cursor.close()
+            return render_template("reset_password.html", token=token)
+
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not password or not confirm_password:
+            cursor.close()
+            flash("Todos los campos son obligatorios", "danger")
+            return render_template("reset_password.html", token=token)
+
+        if password != confirm_password:
+            cursor.close()
+            flash("Las contraseñas no coinciden", "danger")
+            return render_template("reset_password.html", token=token)
+
+        hashed_password = generate_password_hash(password)
+
+        cursor.execute(
+            """
+            UPDATE `users`
+            SET PASSWORD = %s
+            WHERE ID = %s
+            """,
+            (hashed_password, user_id)
+        )
+
+        cursor.execute(
+            """
+            UPDATE password_resets
+            SET USED = 1
+            WHERE ID = %s
+            """,
+            (reset_id,)
+        )
+
+        conexion.connection.commit()
+        cursor.close()
+
+        flash("Contraseña actualizada correctamente. Ya puedes iniciar sesión", "success")
+        return redirect(url_for('login_page'))
+
+    except Exception as ex:
+        try:
+            conexion.connection.rollback()
+        except Exception:
+            pass
+
+        return jsonify({
+            "mensaje": "Error",
+            "error": str(ex)
+        }), 500
 
 @app.route('/group/<int:ID>')
 def group_detail(ID):
