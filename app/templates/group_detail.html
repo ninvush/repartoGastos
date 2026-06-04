@@ -94,10 +94,17 @@
                 <p id="modalExpenseAmount">Cantidad: -- €</p>
                 <p id="modalExpensePaidBy">Pagado por: --</p>
                 <p id="modalExpenseDate">Fecha: --</p>
+                <p id="modalExpensePlace">Lugar: --</p>
             </div>
 
             <div class="modal-footer">
+                <a href="#" target="_blank" id="modalExpenseMapLink" class="btn btn-map-link text-white d-none">
+                    <i class="bi bi-geo-alt"></i>
+                    Abrir Maps
+                </a>
+
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
                 <button type="button" id="modalExpenseEditBtn" class="btn btn-login text-white">
                     <i class="bi bi-pencil-square"></i>
                     Editar
@@ -134,7 +141,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">¿Quién pagó?</label>
-                        <select class="form-control modal-input" name="paid_by" id="expensePaidByInput" required>
+                        <select class="form-control modal-input dark-select" name="paid_by" id="expensePaidByInput" required>
                             <option value="">Selecciona un integrante</option>
 
                             {% for member in members %}
@@ -152,9 +159,12 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Google Maps / API</label>
-                        <input type="text" class="form-control modal-input" name="google_api" id="expenseGoogleApiInput"
-                            placeholder="Opcional: enlace o referencia">
+                        <label class="form-label">Lugar del gasto</label>
+                        <input type="url" class="form-control modal-input" name="google_api" id="expenseGoogleApiInput"
+                            placeholder="Pega aquí un enlace de Google Maps">
+                        <small class="place-helper">
+                            Opcional: abre Google Maps, busca el sitio, pulsa compartir y pega el enlace aquí.
+                        </small>
                     </div>
 
                     <div class="shared-box">

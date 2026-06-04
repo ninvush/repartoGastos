@@ -542,6 +542,55 @@ canvas {
     margin-right: 0;
 }
 
+.btn-map-link {
+    background: linear-gradient(45deg, #18d26e, #00bfff);
+    border: none;
+    transition: 0.25s ease;
+}
+
+.btn-map-link:hover {
+    color: white;
+    transform: scale(1.04);
+    box-shadow: 0 0 16px rgba(24, 210, 110, 0.35);
+}
+
+.btn-map-link i {
+    margin-right: 5px;
+}
+
+select.modal-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-color: rgba(42, 42, 50, 0.96);
+    color: white;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.75) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.75) 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 42px;
+}
+
+select.modal-input option {
+    background-color: #1f2028;
+    color: white;
+}
+
+select.modal-input option:checked {
+    background-color: #00bfff;
+    color: white;
+}
+
+.dark-select {
+    cursor: pointer;
+}
+
 @keyframes rotateGlow {
     from {
         transform: rotate(0deg);

@@ -27,6 +27,8 @@ app.config['MAIL_USERNAME'] = os.environ.get("MAIL_USERNAME")
 app.config['MAIL_PASSWORD'] = os.environ.get("MAIL_PASSWORD")
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get("MAIL_DEFAULT_SENDER")
 
+app.config['GOOGLE_MAPS_API_KEY'] = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+
 mail = Mail(app)
 
 conexion = MySQL(app)
@@ -468,7 +470,8 @@ def group_detail(ID):
             group=group,
             expenses=expenses,
             members=members,
-            current_user_id=user_id
+            current_user_id=int(user_id),
+            google_maps_api_key=app.config['GOOGLE_MAPS_API_KEY']
         )
 
     except Exception as ex:
@@ -1132,7 +1135,7 @@ def debts():
         return render_template(
             "debts.html",
             groups_debts=list(groups_debts.values()),
-            current_user_id=user_id
+            current_user_id=int(user_id)
         )
 
     except Exception as ex:

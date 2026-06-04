@@ -131,6 +131,21 @@ if (expenseModal) {
         document.getElementById('modalExpenseAmount').textContent = `Cantidad: ${selectedExpense.amount} €`;
         document.getElementById('modalExpensePaidBy').textContent = `Pagado por: ${selectedExpense.paidBy}`;
         document.getElementById('modalExpenseDate').textContent = `Fecha: ${selectedExpense.date}`;
+        
+        const modalExpensePlace = document.getElementById('modalExpensePlace');
+        const modalExpenseMapLink = document.getElementById('modalExpenseMapLink');
+
+        if (selectedExpense.googleApi && selectedExpense.googleApi.trim() !== '') {
+            modalExpensePlace.textContent = 'Lugar: enlace de Google Maps guardado';
+
+            modalExpenseMapLink.href = selectedExpense.googleApi;
+            modalExpenseMapLink.classList.remove('d-none');
+        } else {
+            modalExpensePlace.textContent = 'Lugar: --';
+
+            modalExpenseMapLink.href = '#';
+            modalExpenseMapLink.classList.add('d-none');
+        }
     });
 }
 
