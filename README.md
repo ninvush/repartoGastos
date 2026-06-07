@@ -8,6 +8,5 @@ source venv/bin/activate
 Instalación de dependencias:
 pip install -r requirements.txt
 
-
 Ejecución de la aplicación:
 python .\app\app.py Para lanzar la aplicación
