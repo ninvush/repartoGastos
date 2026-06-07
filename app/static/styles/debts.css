@@ -1,3 +1,7 @@
+/* =========================
+   Base
+========================= */
+
 html,
 body {
     width: 100%;
@@ -13,6 +17,15 @@ body {
     position: relative;
     isolation: isolate;
 }
+
+canvas {
+    display: block;
+}
+
+
+/* =========================
+   Fondo
+========================= */
 
 #bg-animation {
     position: fixed;
@@ -34,6 +47,11 @@ body::after {
     pointer-events: none;
 }
 
+
+/* =========================
+   Layout
+========================= */
+
 .debts-wrapper {
     position: relative;
     z-index: 1;
@@ -42,10 +60,23 @@ body::after {
     padding: 70px 24px;
 }
 
+.debts-grid {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 24px;
+}
+
+
+/* =========================
+   Header
+========================= */
+
 .debts-header {
+    position: relative;
     text-align: center;
     margin-bottom: 45px;
-    position: relative;
 }
 
 .header-actions {
@@ -56,6 +87,44 @@ body::after {
     gap: 10px;
 }
 
+.header-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow: 0 0 35px rgba(0, 191, 255, 0.25);
+}
+
+.header-icon i {
+    font-size: 34px;
+}
+
+.debts-header h1 {
+    margin: 0;
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 800;
+}
+
+.debts-header p {
+    margin-top: 12px;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+
+/* =========================
+   Botones navegación
+========================= */
+
 .btn-back,
 .btn-logout,
 .btn-open-group {
@@ -63,11 +132,14 @@ body::after {
     align-items: center;
     justify-content: center;
     gap: 7px;
+
     border: none;
-    text-decoration: none;
     border-radius: 999px;
+
     color: white;
     font-weight: 700;
+    text-decoration: none;
+
     transition: 0.25s ease;
 }
 
@@ -88,44 +160,18 @@ body::after {
     background: rgba(255, 255, 255, 0.15);
 }
 
-.header-icon {
-    width: 76px;
-    height: 76px;
-    margin: 0 auto 18px;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 0 35px rgba(0, 191, 255, 0.25);
+.btn-open-group {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    box-shadow: 0 0 18px rgba(0, 191, 255, 0.28);
 }
 
-.header-icon i {
-    font-size: 34px;
-}
 
-.debts-header h1 {
-    font-size: clamp(2.2rem, 5vw, 4rem);
-    font-weight: 800;
-    margin: 0;
-}
-
-.debts-header p {
-    margin-top: 12px;
-    font-size: 1.05rem;
-    color: rgba(255, 255, 255, 0.72);
-}
-
-.debts-grid {
-    width: min(1180px, 100%);
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-    gap: 24px;
-}
+/* =========================
+   Tarjetas de deuda
+========================= */
 
 .debt-card {
     position: relative;
@@ -147,6 +193,7 @@ body::after {
     content: "";
     position: absolute;
     inset: -45%;
+
     background: conic-gradient(
         from 120deg,
         transparent,
@@ -157,6 +204,7 @@ body::after {
         rgba(221, 36, 118, 0.22),
         transparent
     );
+
     opacity: 0.35;
     animation: rotateGlow 12s linear infinite;
 }
@@ -165,9 +213,10 @@ body::after {
     content: "";
     position: absolute;
     inset: 1px;
+    z-index: 1;
+
     border-radius: 27px;
     background: rgba(8, 9, 14, 0.82);
-    z-index: 1;
 }
 
 .debt-card > * {
@@ -193,18 +242,21 @@ body::after {
     color: rgba(255, 255, 255, 0.62);
 }
 
-.btn-open-group {
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(45deg, #00bfff, #8a2be2);
-    box-shadow: 0 0 18px rgba(0, 191, 255, 0.28);
-}
+
+/* =========================
+   Gráfico
+========================= */
 
 .chart-box {
     width: 100%;
     max-width: 260px;
     margin: 0 auto 24px;
 }
+
+
+/* =========================
+   Lista de deudas
+========================= */
 
 .debts-list {
     display: flex;
@@ -216,10 +268,16 @@ body::after {
     display: flex;
     justify-content: space-between;
     gap: 14px;
+
     padding: 12px 14px;
     border-radius: 16px;
+
     background: rgba(255, 255, 255, 0.065);
     border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.debt-info {
+    min-width: 0;
 }
 
 .debt-row strong {
@@ -239,11 +297,53 @@ body::after {
     color: white;
 }
 
+.debt-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+
+/* =========================
+   Botón saldar deuda
+========================= */
+
+.btn-settle-debt {
+    border: none;
+    border-radius: 999px;
+    padding: 7px 12px;
+
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
+    box-shadow: 0 0 16px rgba(0, 191, 255, 0.22);
+
+    transition: 0.25s ease;
+}
+
+.btn-settle-debt:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 24px rgba(0, 191, 255, 0.36);
+}
+
+.btn-settle-debt i {
+    margin-right: 4px;
+}
+
+
+/* =========================
+   Estado vacío
+========================= */
+
 .empty-state {
     grid-column: 1 / -1;
     text-align: center;
     padding: 54px 24px;
     border-radius: 28px;
+
     background: rgba(255, 255, 255, 0.075);
     border: 1px solid rgba(255, 255, 255, 0.14);
     backdrop-filter: blur(14px);
@@ -265,61 +365,25 @@ body::after {
     color: rgba(255, 255, 255, 0.68);
 }
 
-canvas {
-    display: block;
-}
-.debt-info {
-    min-width: 0;
-}
 
-.debt-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-}
-
-.btn-settle-debt {
-    border: none;
-    border-radius: 999px;
-    padding: 7px 12px;
-    color: white;
-    font-size: 0.78rem;
-    font-weight: 700;
-    background: linear-gradient(45deg, #00bfff, #8a2be2);
-    box-shadow: 0 0 16px rgba(0, 191, 255, 0.22);
-    transition: 0.25s ease;
-}
-
-.btn-settle-debt:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 0 24px rgba(0, 191, 255, 0.36);
-}
-
-.btn-settle-debt i {
-    margin-right: 4px;
-}
-
-@media (max-width: 576px) {
-    .debt-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .debt-actions {
-        align-items: flex-start;
-        width: 100%;
-    }
-}
+/* =========================
+   Animaciones
+========================= */
 
 @keyframes rotateGlow {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
 }
+
+
+/* =========================
+   Responsive
+========================= */
 
 @media (max-width: 700px) {
     .debts-wrapper {
@@ -330,5 +394,22 @@ canvas {
         position: static;
         justify-content: center;
         margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 576px) {
+    .debts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .debt-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .debt-actions {
+        width: 100%;
+        align-items: flex-start;
     }
 }

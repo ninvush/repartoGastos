@@ -26,7 +26,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setClearColor(0x000000, 1);
 container.appendChild(renderer.domElement);
 
-// Luces
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
 scene.add(ambientLight);
 
@@ -86,7 +85,7 @@ const wireframe = new THREE.Mesh(
 wireframe.rotation.copy(mobiusMesh.rotation);
 scene.add(wireframe);
 
-// Partículas suaves de fondo (opcional)
+// Partículas suaves de fondo
 const particlesCount = 250;
 const particlesGeometry = new THREE.BufferGeometry();
 const positions = new Float32Array(particlesCount * 3);
@@ -126,7 +125,6 @@ function animate() {
 
 animate();
 
-// Responsive
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

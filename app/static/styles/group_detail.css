@@ -1,3 +1,7 @@
+/* =========================
+   Base
+========================= */
+
 html,
 body {
     width: 100%;
@@ -7,11 +11,20 @@ body {
 }
 
 body {
+    position: relative;
+    color: white;
     background: #000;
     font-family: 'Segoe UI', sans-serif;
-    color: white;
-    position: relative;
 }
+
+canvas {
+    display: block;
+}
+
+
+/* =========================
+   Fondo animado
+========================= */
 
 #bg-animation {
     position: fixed;
@@ -26,12 +39,17 @@ body::after {
     position: fixed;
     inset: 0;
     z-index: 0;
+    pointer-events: none;
     background:
         radial-gradient(circle at top left, rgba(0, 191, 255, 0.16), transparent 34%),
         radial-gradient(circle at bottom right, rgba(221, 36, 118, 0.13), transparent 36%),
         rgba(0, 0, 0, 0.18);
-    pointer-events: none;
 }
+
+
+/* =========================
+   Layout
+========================= */
 
 .expenses-wrapper {
     position: relative;
@@ -41,36 +59,58 @@ body::after {
     padding: 60px 24px;
 }
 
-.modal-backdrop {
-    z-index: 1040 !important;
-}
-
-.modal {
-    z-index: 1055 !important;
-}
-
-.modal-dialog {
-    z-index: 1060 !important;
-}
-
-body.modal-open::after {
-    z-index: 1;
-}
-
 .expenses-header {
-    text-align: center;
-    margin-bottom: 45px;
     position: relative;
+    margin-bottom: 45px;
+    text-align: center;
 }
+
+.expenses-header h1 {
+    margin: 0;
+    font-size: clamp(2.1rem, 5vw, 3.7rem);
+    font-weight: 800;
+}
+
+.expenses-header p {
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.68);
+}
+
+.header-icon {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 18px;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 35px rgba(0, 191, 255, 0.24);
+}
+
+.header-icon i {
+    font-size: 34px;
+}
+
+
+/* =========================
+   Navegación y acciones
+========================= */
 
 .back-link {
     position: absolute;
-    left: 0;
     top: 0;
-    color: rgba(255, 255, 255, 0.82);
-    text-decoration: none;
+    left: 0;
+
     padding: 10px 16px;
     border-radius: 999px;
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
     backdrop-filter: blur(12px);
@@ -84,35 +124,36 @@ body.modal-open::after {
     background: rgba(255, 255, 255, 0.14);
 }
 
-.header-icon {
-    width: 78px;
-    height: 78px;
-    margin: 0 auto 18px;
-    border-radius: 26px;
+.group-actions {
+    position: relative;
+    z-index: 5;
+    margin-top: 22px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 0 35px rgba(0, 191, 255, 0.24);
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
 }
 
-.header-icon i {
-    font-size: 34px;
-}
-
-.expenses-header h1 {
-    font-size: clamp(2.1rem, 5vw, 3.7rem);
-    font-weight: 800;
+.group-actions form {
     margin: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
 }
 
-.expenses-header p {
-    margin-top: 10px;
-    color: rgba(255, 255, 255, 0.68);
+.debug-user-info {
+    position: relative;
+    z-index: 5;
+    margin-top: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.9rem;
 }
+
+
+/* =========================
+   Grid de gastos
+========================= */
 
 .expenses-grid {
     width: min(1100px, 100%);
@@ -122,19 +163,24 @@ body.modal-open::after {
     gap: 24px;
 }
 
+
+/* =========================
+   Tarjetas de gasto
+========================= */
+
 .expense-card {
     position: relative;
     min-height: 175px;
     padding: 26px;
-    border-radius: 28px;
     overflow: hidden;
-    text-decoration: none;
-    color: white;
-    text-align: left;
     cursor: pointer;
 
-    background: rgba(255, 255, 255, 0.075);
+    color: white;
+    text-align: left;
+    text-decoration: none;
+    border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.075);
 
     box-shadow:
         0 18px 45px rgba(0, 0, 0, 0.38),
@@ -158,6 +204,7 @@ body.modal-open::after {
     content: "";
     position: absolute;
     inset: -45%;
+    opacity: 0;
     background: conic-gradient(
         from 90deg,
         transparent,
@@ -168,7 +215,6 @@ body.modal-open::after {
         rgba(221, 36, 118, 0.26),
         transparent
     );
-    opacity: 0;
     transition: opacity 0.28s ease;
     animation: rotateGlow 8s linear infinite;
 }
@@ -181,9 +227,9 @@ body.modal-open::after {
     content: "";
     position: absolute;
     inset: 1px;
+    z-index: 1;
     border-radius: 27px;
     background: rgba(8, 9, 14, 0.76);
-    z-index: 1;
 }
 
 .expense-content,
@@ -194,9 +240,9 @@ body.modal-open::after {
 }
 
 .expense-content h2 {
+    margin: 0 0 8px;
     font-size: 1.35rem;
     font-weight: 750;
-    margin: 0 0 8px;
 }
 
 .expense-content p {
@@ -208,12 +254,14 @@ body.modal-open::after {
     position: absolute;
     right: 22px;
     bottom: 20px;
+
     width: 42px;
     height: 42px;
     border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: linear-gradient(45deg, #00bfff, #8a2be2);
     box-shadow: 0 0 18px rgba(0, 191, 255, 0.32);
     transition: transform 0.28s ease;
@@ -254,10 +302,16 @@ body.modal-open::after {
     animation-duration: 11s;
 }
 
+
+/* =========================
+   Estado vacío
+========================= */
+
 .empty-state {
     grid-column: 1 / -1;
-    text-align: center;
     padding: 52px 24px;
+    text-align: center;
+
     border-radius: 28px;
     background: rgba(255, 255, 255, 0.075);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -280,8 +334,25 @@ body.modal-open::after {
     color: rgba(255, 255, 255, 0.68);
 }
 
-canvas {
-    display: block;
+
+/* =========================
+   Modales
+========================= */
+
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-dialog {
+    z-index: 1060 !important;
+}
+
+body.modal-open::after {
+    z-index: 1;
 }
 
 .custom-modal {
@@ -306,32 +377,31 @@ canvas {
 }
 
 .custom-modal .modal-body h3 {
+    margin-bottom: 16px;
     font-size: 1.6rem;
     font-weight: 800;
-    margin-bottom: 16px;
 }
 
 .custom-modal .modal-body p {
-    color: rgba(255, 255, 255, 0.76);
     margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.76);
 }
 
-.btn-login {
-    background: linear-gradient(45deg, #00bfff, #8a2be2);
-    border: none;
-    transition: 0.25s ease;
+.custom-modal .form-label {
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 600;
 }
 
-.btn-login:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 16px rgba(0, 191, 255, 0.35);
-}
+
+/* =========================
+   Formularios
+========================= */
 
 .modal-input {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.16);
     color: white;
     border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.12);
 }
 
 .modal-input::placeholder {
@@ -339,16 +409,48 @@ canvas {
 }
 
 .modal-input:focus {
+    color: white;
     background: rgba(255, 255, 255, 0.18);
     border-color: rgba(0, 191, 255, 0.55);
     box-shadow: 0 0 0 0.2rem rgba(0, 191, 255, 0.16);
-    color: white;
 }
 
-.custom-modal .form-label {
-    color: rgba(255, 255, 255, 0.78);
-    font-weight: 600;
+select.modal-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    color: white;
+    padding-right: 42px;
+    background-color: rgba(42, 42, 50, 0.96);
+    background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.75) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.75) 50%, transparent 50%);
+    background-position:
+        calc(100% - 20px) 50%,
+        calc(100% - 14px) 50%;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
 }
+
+select.modal-input option {
+    color: white;
+    background-color: #1f2028;
+}
+
+select.modal-input option:checked {
+    color: white;
+    background-color: #00bfff;
+}
+
+.dark-select {
+    cursor: pointer;
+}
+
+
+/* =========================
+   Reparto de integrantes
+========================= */
 
 .shared-box {
     margin-top: 24px;
@@ -359,11 +461,11 @@ canvas {
 }
 
 .shared-header {
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    margin-bottom: 16px;
 }
 
 .shared-header h6 {
@@ -374,23 +476,8 @@ canvas {
 
 .shared-header p {
     margin: 4px 0 0;
-    font-size: 0.88rem;
     color: rgba(255, 255, 255, 0.62);
-}
-
-.btn-select-all {
-    border: none;
-    border-radius: 999px;
-    padding: 8px 14px;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.12);
-    transition: 0.25s ease;
-}
-
-.btn-select-all:hover {
-    background: rgba(255, 255, 255, 0.2);
+    font-size: 0.88rem;
 }
 
 .members-grid {
@@ -401,15 +488,16 @@ canvas {
 
 .member-check-card {
     position: relative;
+    min-height: 74px;
+    padding: 14px;
+    overflow: hidden;
+    cursor: pointer;
+
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 74px;
-    padding: 14px;
-    border-radius: 18px;
-    cursor: pointer;
-    overflow: hidden;
 
+    border-radius: 18px;
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.11);
     transition: 0.25s ease;
@@ -422,17 +510,17 @@ canvas {
 }
 
 .member-check-card input {
+    position: relative;
+    z-index: 2;
     width: 18px;
     height: 18px;
     accent-color: #00bfff;
-    position: relative;
-    z-index: 2;
 }
 
 .member-orb {
     position: absolute;
-    right: -16px;
     top: -16px;
+    right: -16px;
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -460,10 +548,10 @@ canvas {
     margin-top: 16px;
     padding: 12px 14px;
     border-radius: 16px;
-    background: rgba(0, 191, 255, 0.09);
-    border: 1px solid rgba(0, 191, 255, 0.16);
     color: rgba(255, 255, 255, 0.82);
     font-weight: 600;
+    background: rgba(0, 191, 255, 0.09);
+    border: 1px solid rgba(0, 191, 255, 0.16);
 }
 
 .split-preview i {
@@ -471,47 +559,44 @@ canvas {
 }
 
 
-.group-actions {
-    position: relative;
-    z-index: 5;
-    margin-top: 22px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
+/* =========================
+   Botones
+========================= */
+
+.btn-login,
+.btn-create-expense,
+.btn-delete-group,
+.btn-map-link,
+.btn-select-all {
+    border: none;
+    color: white;
+    transition: 0.25s ease;
 }
 
-.group-actions form {
-    margin: 0;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
+.btn-login {
+    background: linear-gradient(45deg, #00bfff, #8a2be2);
 }
 
-.debug-user-info {
-    position: relative;
-    z-index: 5;
-    margin-top: 12px;
-    color: rgba(255, 255, 255, 0.65);
-    font-size: 0.9rem;
+.btn-login:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 16px rgba(0, 191, 255, 0.35);
 }
+
 .btn-create-expense,
 .btn-delete-group {
+    position: relative;
+    z-index: 6;
     min-height: 48px;
     padding: 12px 22px;
-    border: none;
     border-radius: 999px;
-    color: white;
-    font-weight: 700;
-    line-height: 1;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    position: relative;
-    z-index: 6;
-    transition: 0.25s ease;
+
+    font-weight: 700;
+    line-height: 1;
 }
 
 .btn-create-expense {
@@ -544,8 +629,6 @@ canvas {
 
 .btn-map-link {
     background: linear-gradient(45deg, #18d26e, #00bfff);
-    border: none;
-    transition: 0.25s ease;
 }
 
 .btn-map-link:hover {
@@ -558,43 +641,28 @@ canvas {
     margin-right: 5px;
 }
 
-select.modal-input {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-
-    background-color: rgba(42, 42, 50, 0.96);
-    color: white;
-
-    background-image:
-        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.75) 50%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.75) 50%, transparent 50%);
-    background-position:
-        calc(100% - 20px) 50%,
-        calc(100% - 14px) 50%;
-    background-size: 6px 6px, 6px 6px;
-    background-repeat: no-repeat;
-    padding-right: 42px;
+.btn-select-all {
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.12);
 }
 
-select.modal-input option {
-    background-color: #1f2028;
-    color: white;
+.btn-select-all:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-select.modal-input option:checked {
-    background-color: #00bfff;
-    color: white;
-}
 
-.dark-select {
-    cursor: pointer;
-}
+/* =========================
+   Animaciones
+========================= */
 
 @keyframes rotateGlow {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -604,28 +672,45 @@ select.modal-input option:checked {
     from {
         transform: rotate(0deg) scale(1);
     }
+
     50% {
         transform: rotate(180deg) scale(1.12);
     }
+
     to {
         transform: rotate(360deg) scale(1);
     }
 }
 
-/* Responsive */
+
+/* =========================
+   Responsive
+========================= */
+
 @media (max-width: 700px) {
     .expenses-wrapper {
         padding: 90px 16px 40px;
     }
 
     .back-link {
-        left: 50%;
-        transform: translateX(-50%);
         top: -58px;
+        left: 50%;
         white-space: nowrap;
+        transform: translateX(-50%);
     }
 
     .back-link:hover {
         transform: translateX(-50%);
+    }
+}
+
+@media (hover: none) {
+    .expense-card:hover,
+    .member-check-card:hover,
+    .btn-create-expense:hover,
+    .btn-delete-group:hover,
+    .btn-login:hover,
+    .btn-map-link:hover {
+        transform: none;
     }
 }
