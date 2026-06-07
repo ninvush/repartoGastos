@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 31-05-2026 a las 16:29:26
+-- Tiempo de generación: 07-06-2026 a las 18:00:19
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -45,16 +45,31 @@ CREATE TABLE `debts` (
 INSERT INTO `debts` (`ID`, `FROM_USER`, `TO_USER`, `AMOUNT`, `GROUP_ID`, `GROUP_NAME`, `CREATION_TIME`, `MODIFICATION_TIME`) VALUES
 (33, 1, 8, 320.00, 1, 'Prueba deudas', '2026-05-30 08:52:14', '2026-05-30 08:52:14'),
 (34, 1, 13, 500.00, 1, 'Prueba deudas', '2026-05-30 08:52:14', '2026-05-30 08:52:14'),
-(35, 8, 13, 180.00, 1, 'Prueba deudas', '2026-05-30 08:52:14', '2026-05-30 08:52:14'),
 (36, 18, 8, 320.00, 1, 'Prueba deudas', '2026-05-30 08:52:14', '2026-05-30 08:52:14'),
 (37, 18, 13, 500.00, 1, 'Prueba deudas', '2026-05-30 08:52:14', '2026-05-30 08:52:14'),
-(46, 10, 8, 72.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(47, 13, 8, 100.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(48, 13, 10, 28.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(49, 14, 8, 100.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(50, 14, 10, 28.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(51, 18, 8, 100.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56'),
-(52, 18, 10, 28.00, 2, 'Gastos roma', '2026-05-30 08:53:56', '2026-05-30 08:53:56');
+(104, 10, 8, 22272.00, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(106, 18, 8, 19837.60, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(107, 10, 13, 99999971.99, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(108, 10, 18, 2434.40, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(109, 18, 13, 99997537.59, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(110, 14, 8, 22300.00, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(111, 14, 10, 28.00, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(112, 14, 13, 99999999.99, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(113, 14, 18, 2462.40, 2, 'Gastos roma', '2026-06-05 15:52:37', '2026-06-05 15:52:37'),
+(140, 7, 1, 1960.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(142, 7, 24, 360.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(143, 9, 1, 2000.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(144, 9, 7, 40.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(145, 9, 24, 400.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(146, 13, 1, 2000.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(147, 13, 7, 40.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(148, 13, 24, 400.00, 4, 'Viaje Italia', '2026-06-05 16:35:37', '2026-06-05 16:35:37'),
+(163, 2, 1, 2000040.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45'),
+(164, 2, 25, 500.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45'),
+(165, 18, 1, 2000040.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45'),
+(166, 18, 25, 500.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45'),
+(167, 23, 1, 2000040.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45'),
+(168, 23, 25, 500.00, 6, 'Viaje a italia', '2026-06-05 17:02:45', '2026-06-05 17:02:45');
 
 -- --------------------------------------------------------
 
@@ -82,7 +97,18 @@ INSERT INTO `expenses` (`ID`, `GROUP_ID`, `USER_ID`, `NAME`, `AMOUNT`, `GOOGLE_A
 (2, 1, 13, 'Prueba gasto 2000', 2000.00, 'algo', '2026-05-30 08:30:00', '2026-05-30 08:52:14'),
 (3, 2, 8, 'Taxi', 50.00, 'algo', '2026-05-30 08:52:00', '2026-05-30 08:53:05'),
 (4, 2, 8, 'Hotel roma', 450.00, 'algo', '2026-05-30 08:53:00', '2026-05-30 08:53:30'),
-(5, 2, 10, 'Coliseo', 140.00, 'algo', '2026-05-30 08:53:00', '2026-05-30 08:53:56');
+(5, 2, 10, 'Coliseo', 140.00, 'algo', '2026-05-30 08:53:00', '2026-05-30 08:53:56'),
+(7, 2, 8, 'Hotel laguna', 1000.00, '', '2026-06-04 19:56:00', '2026-06-04 19:56:17'),
+(8, 2, 8, 'Prueba google', 100000.00, 'https://maps.app.goo.gl/Wv2QitVzLi2Pg6nV9', '2026-06-04 20:08:00', '2026-06-04 20:09:11'),
+(9, 2, 13, 'Hotel duero', 99999999.99, 'https://maps.app.goo.gl/qXZHuBs9nmCqt9t48', '2026-06-28 20:10:00', '2026-06-04 20:11:49'),
+(10, 2, 18, 'Prueba gasto 1000', 12312.00, '', '2026-06-04 20:21:00', '2026-06-04 20:22:03'),
+(11, 2, 8, 'Prueba gasto 1000', 10000.00, 'https://maps.app.goo.gl/BpUFsLT4jqKw9x92A', '2026-06-05 15:52:00', '2026-06-05 15:52:37'),
+(12, 4, 24, 'Vuelo', 2000.00, 'https://maps.app.goo.gl/y2sdrqYYNsrWLd8EA', '2026-06-05 20:00:00', '2026-06-05 16:34:31'),
+(13, 4, 7, 'Hotel', 200.00, '', '2026-06-25 16:34:00', '2026-06-05 16:34:26'),
+(14, 4, 1, 'Comida lujo', 10000.00, '', '2026-06-26 16:35:00', '2026-06-05 16:35:37'),
+(16, 6, 25, 'Vuelo', 2500.00, 'https://maps.app.goo.gl/Wv2QitVzLi2Pg6nV9', '2026-06-05 17:00:00', '2026-06-05 17:01:25'),
+(17, 6, 1, 'Cena', 200.00, 'https://maps.app.goo.gl/Wv2QitVzLi2Pg6nV9', '2026-06-05 17:01:00', '2026-06-05 17:01:56'),
+(18, 6, 1, 'Carlos prueba', 10000000.00, '', '2026-06-05 17:02:00', '2026-06-05 17:02:45');
 
 -- --------------------------------------------------------
 
@@ -124,7 +150,62 @@ INSERT INTO `expense_shared` (`ID`, `EXPENSE_ID`, `USER_ID`, `AMOUNT`) VALUES
 (48, 5, 13, 28.00),
 (49, 5, 10, 28.00),
 (50, 5, 14, 28.00),
-(51, 5, 8, 28.00);
+(51, 5, 8, 28.00),
+(57, 7, 18, 200.00),
+(58, 7, 13, 200.00),
+(59, 7, 10, 200.00),
+(60, 7, 14, 200.00),
+(61, 7, 8, 200.00),
+(62, 8, 18, 20000.00),
+(63, 8, 13, 20000.00),
+(64, 8, 10, 20000.00),
+(65, 8, 14, 20000.00),
+(66, 8, 8, 20000.00),
+(77, 9, 18, 99999999.99),
+(78, 9, 13, 99999999.99),
+(79, 9, 10, 99999999.99),
+(80, 9, 14, 99999999.99),
+(81, 9, 8, 99999999.99),
+(82, 10, 18, 2462.40),
+(83, 10, 13, 2462.40),
+(84, 10, 10, 2462.40),
+(85, 10, 14, 2462.40),
+(86, 10, 8, 2462.40),
+(87, 11, 18, 2000.00),
+(88, 11, 13, 2000.00),
+(89, 11, 10, 2000.00),
+(90, 11, 14, 2000.00),
+(91, 11, 8, 2000.00),
+(107, 13, 1, 40.00),
+(108, 13, 13, 40.00),
+(109, 13, 7, 40.00),
+(110, 13, 9, 40.00),
+(111, 13, 24, 40.00),
+(112, 12, 1, 400.00),
+(113, 12, 13, 400.00),
+(114, 12, 7, 400.00),
+(115, 12, 9, 400.00),
+(116, 12, 24, 400.00),
+(117, 14, 1, 2000.00),
+(118, 14, 13, 2000.00),
+(119, 14, 7, 2000.00),
+(120, 14, 9, 2000.00),
+(121, 14, 24, 2000.00),
+(125, 16, 18, 500.00),
+(126, 16, 2, 500.00),
+(127, 16, 23, 500.00),
+(128, 16, 1, 500.00),
+(129, 16, 25, 500.00),
+(130, 17, 18, 40.00),
+(131, 17, 2, 40.00),
+(132, 17, 23, 40.00),
+(133, 17, 1, 40.00),
+(134, 17, 25, 40.00),
+(135, 18, 18, 2000000.00),
+(136, 18, 2, 2000000.00),
+(137, 18, 23, 2000000.00),
+(138, 18, 1, 2000000.00),
+(139, 18, 25, 2000000.00);
 
 -- --------------------------------------------------------
 
@@ -145,7 +226,9 @@ CREATE TABLE `groups` (
 
 INSERT INTO `groups` (`ID`, `NAME`, `CREATOR_USER`, `CREATION`) VALUES
 (1, 'Prueba deudas', 8, '2026-05-30 08:18:39'),
-(2, 'Gastos roma', 8, '2026-05-30 08:52:43');
+(2, 'Gastos roma', 8, '2026-05-30 08:52:43'),
+(4, 'Viaje Italia', 24, '2026-06-05 16:30:22'),
+(6, 'Viaje a italia', 25, '2026-06-05 17:00:04');
 
 -- --------------------------------------------------------
 
@@ -172,7 +255,30 @@ INSERT INTO `group_users` (`ID`, `USER_INVITED`, `INVITE_USER`, `GROUP_ID`, `INV
 (4, 18, 8, 2, '2026-05-30 08:52:43'),
 (5, 13, 8, 2, '2026-05-30 08:52:43'),
 (6, 10, 8, 2, '2026-05-30 08:52:43'),
-(7, 14, 8, 2, '2026-05-30 08:52:43');
+(7, 14, 8, 2, '2026-05-30 08:52:43'),
+(9, 1, 24, 4, '2026-06-05 16:30:22'),
+(10, 13, 24, 4, '2026-06-05 16:30:22'),
+(11, 7, 24, 4, '2026-06-05 16:30:22'),
+(12, 9, 24, 4, '2026-06-05 16:30:22'),
+(14, 18, 25, 6, '2026-06-05 17:00:04'),
+(15, 2, 25, 6, '2026-06-05 17:00:04'),
+(16, 23, 25, 6, '2026-06-05 17:00:04'),
+(17, 1, 25, 6, '2026-06-05 17:00:04');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `ID` int(11) NOT NULL,
+  `USER_ID` int(11) NOT NULL,
+  `TOKEN` varchar(255) NOT NULL,
+  `EXPIRATION_TIME` datetime NOT NULL,
+  `USED` tinyint(1) NOT NULL DEFAULT 0,
+  `CREATION_TIME` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -215,7 +321,9 @@ INSERT INTO `users` (`ID`, `NAME`, `EMAIL`, `PASSWORD`, `CREATION`) VALUES
 (20, 'Raúl', 'raul@email.com', 'scrypt:32768:8:1$Asnq37DW4JBTi1cd$f33889cd9606ce95de69f0eff8654de0a7f51538f8db5ef831af42881121fdafe5b26b04c4e52f6d280b3a1ae63a68f44943a9b631aae813476703f5726147ac', '2026-05-02 16:35:00'),
 (21, 'Pepe', 'pepemaster@hotmail.com', 'scrypt:32768:8:1$JtLyn0bD45fQ8FPu$22204f90044d9909b1c425dcbb6fa3c20afe84e0f7823fd174306d7e70e2fe2278f4ee6741e5b8292b842ffb11b2d8f196d3cc7b290539fac1ed5b30ea7266b4', '2026-05-24 15:28:43'),
 (22, 'Ejemplo2', 'ejemplo4@gmail.com', 'scrypt:32768:8:1$ndFDUQ85jzsHAVoR$37e8c2b7394e705cc6f75ab9140b43e3fdb7bd70ad83f62b177a57b70e362c13f07a3f79c6bb2fb52cc2c9d7bc3008c192ae7344376071b118f529f0c01d9397', '2026-05-24 15:36:23'),
-(23, 'Beckam', 'davidelbecario@hotmail.com', 'scrypt:32768:8:1$4oHst1zhGvWctynA$c95f337e8c0f0f2018563e0c820d4523706bac164e211e44f4a5b9cd052960679f0ce855857bd3e48918ae9b80bc4c974009be4bdb8cf4394162c317bd508956', '2026-05-24 16:12:21');
+(23, 'Beckam', 'davidelbecario@hotmail.com', 'scrypt:32768:8:1$4oHst1zhGvWctynA$c95f337e8c0f0f2018563e0c820d4523706bac164e211e44f4a5b9cd052960679f0ce855857bd3e48918ae9b80bc4c974009be4bdb8cf4394162c317bd508956', '2026-05-24 16:12:21'),
+(24, 'Prueba', 'prueba@gmail.com', 'scrypt:32768:8:1$0oqxb24g64ZCMvZ2$f2dfa131d013644293b468bef4d0038876694f37d03a4f1ba5b37cbf5f866f19800fa6158d1b8855d9a9d3b810da9305ee1fec584cd35cf092447623e74d7a5c', '2026-06-05 16:27:29'),
+(25, 'Prueba2', 'prueba2@gmail.com', 'scrypt:32768:8:1$fbTvOv5C6s81DJwM$2a00a4e1f06c677d4d903b075d6139fe22cf630c49e1d780aab6ba06f171557371d8beb9b2f5fbbcf5768522435f8fa97343fb6f31bbf9c6941c61d2a1243fc3', '2026-06-05 16:58:05');
 
 --
 -- Índices para tablas volcadas
@@ -262,6 +370,14 @@ ALTER TABLE `group_users`
   ADD KEY `GROUP_ID` (`GROUP_ID`);
 
 --
+-- Indices de la tabla `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `TOKEN` (`TOKEN`),
+  ADD KEY `USER_ID` (`USER_ID`);
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -276,37 +392,43 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `debts`
 --
 ALTER TABLE `debts`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
 -- AUTO_INCREMENT de la tabla `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `expense_shared`
 --
 ALTER TABLE `expense_shared`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
 
 --
 -- AUTO_INCREMENT de la tabla `groups`
 --
 ALTER TABLE `groups`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `group_users`
 --
 ALTER TABLE `group_users`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT de la tabla `password_resets`
+--
+ALTER TABLE `password_resets`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Restricciones para tablas volcadas
@@ -346,6 +468,12 @@ ALTER TABLE `group_users`
   ADD CONSTRAINT `group_users_ibfk_1` FOREIGN KEY (`USER_INVITED`) REFERENCES `users` (`ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `group_users_ibfk_2` FOREIGN KEY (`INVITE_USER`) REFERENCES `users` (`ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `group_users_ibfk_3` FOREIGN KEY (`GROUP_ID`) REFERENCES `groups` (`ID`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`USER_ID`) REFERENCES `users` (`ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
